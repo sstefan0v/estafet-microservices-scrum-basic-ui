@@ -4,7 +4,7 @@ node("maven") {
 	def microservice = "basic-ui"
 
 	stage("checkout") {
-		git branch: "master", url: "https://github.com/Estafet-LTD/estafet-microservices-scrum-basic-ui"
+		git branch: "master", url: "https://github.com/sstefan0v/estafet-microservices-scrum-basic-ui"
 	}
 
 	stage("update wiremock") {

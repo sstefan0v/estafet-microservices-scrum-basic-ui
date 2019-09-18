@@ -10,23 +10,30 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+import io.jaegertracing.Configuration.ReporterConfiguration;
+import io.jaegertracing.Configuration.SamplerConfiguration;
+import io.opentracing.Tracer;
+
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-    
-	@Bean
-	public io.opentracing.Tracer jaegerTracer() {
-		return new com.uber.jaeger.Configuration("basic-ui",
-				com.uber.jaeger.Configuration.SamplerConfiguration.fromEnv(),
-				com.uber.jaeger.Configuration.ReporterConfiguration.fromEnv()).getTracer();
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
 	}
-	
+
+	@Bean
+	public static Tracer init() {
+		final SamplerConfiguration samplerConfig = SamplerConfiguration.fromEnv().withType("const")
+				.withParam(new Integer(1));
+		final ReporterConfiguration reportConfig = ReporterConfiguration.fromEnv().withLogSpans(Boolean.TRUE);
+		final io.jaegertracing.Configuration configuration = new io.jaegertracing.Configuration("basic-ui")
+				.withSampler(samplerConfig).withReporter(reportConfig);
+		return configuration.getTracer();
+	}
+
 	@Bean
 	public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
 		return restTemplateBuilder.build();
